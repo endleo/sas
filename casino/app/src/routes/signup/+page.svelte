@@ -6,13 +6,6 @@
 </script>
 
 <style>
-  .material-symbols-outlined {
-    font-variation-settings:
-      "FILL" 0,
-      "wght" 400,
-      "GRAD" 0,
-      "opsz" 24;
-  }
   .glass-panel {
     background: rgba(23, 31, 51, 0.6);
     backdrop-filter: blur(20px);
@@ -26,7 +19,7 @@
 <main
   class="relative z-10 min-h-screen flex items-center justify-center px-4 pt-20 pb-12"
 >
-  <div class="w-full max-w-[480px]">
+  <div class="w-full max-w-120">
     <!-- Auth Container -->
     <div
       class="glass-panel p-8 md:p-12 rounded-xl shadow-2xl border border-white/5 relative overflow-hidden"
