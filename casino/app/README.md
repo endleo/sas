@@ -4,7 +4,13 @@ Casino CTF, powered by [Svelte](https://svelte.dev/).
 
 ## Developing
 
-Once you've installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Once you've installed dependencies with `npm install` (or `pnpm install` or `yarn`), initialize the database
+
+```sh
+npm run db:push
+```
+
+and start a development server:
 
 ```sh
 npm run dev
@@ -27,10 +33,12 @@ Any file under `src/routes` that is **not** a `+page.svelte` or `+layout.svelte`
 
 Since this is just a CTF, there is no point in using a sophisticated database setup. We stick with a simple SQLite database (i.e., a database file), located on the server at `./local.db`. Our ORM is [drizzle](https://svelte.dev/docs/cli/drizzle), which provides simple access to the db and integrates well with better-auth (see below).
 
+The schema can be found at `$lib/server/db/schema.ts`, and any further tables necessary can be added to that file. The project comes with `drizzle-kit`, which provides the script `npm run db:push` to update the database file after changes have been made in the schema file.
+
+
+
 TODO:
 - usage (import db)
-- schema files
-- db push script
 
 ### Authentication
 
