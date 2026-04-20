@@ -1,9 +1,22 @@
+import { relations } from 'drizzle-orm/relations';
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { user } from './auth.schema';
 
-export const task = sqliteTable('task', {
+export const lcg = sqliteTable('lcg', {
 	id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
-	title: text('title').notNull(),
-	priority: integer('priority').notNull().default(1)
+	lastResult: integer('last_result').notNull(),
+	multiplier: integer('multiplier').notNull(),
+	increment: integer('increment').notNull(),
+	modulus: integer('modulus').notNull(),
+	userId: text('user_id').notNull(),
 });
+
+export const lcgRelations = relations(lcg, ({ one }) => ({
+  user: one(user, {
+    fields: [lcg.userId],
+    references: [user.id]
+  })
+}));
+
 
 export *  from './auth.schema';
