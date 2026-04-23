@@ -21,7 +21,7 @@
     use:enhance={() => {
       return async ({ update }) => {
         for (const bet in bets) {
-          bets[bet] = 0;
+//          bets[bet] = 0;
         }
         update({ reset: false });
       };
