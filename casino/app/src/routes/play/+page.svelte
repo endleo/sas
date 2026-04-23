@@ -21,26 +21,26 @@
     use:enhance={() => {
       return async ({ update }) => {
         for (const bet in bets) {
-//          bets[bet] = 0;
+          //          bets[bet] = 0;
         }
         update({ reset: false });
       };
     }}
   >
-      <div class="grid grid-cols-6 gap-4 w-fit items-center">
-        {#each Object.keys(possibleBets) as bet}
-          <label for={bet}>Bet on {bet}:</label>
-          <input
-            class="bg-surface"
-            type="number"
-            id={bet}
-            name={bet}
-            min="0"
-            max="100000"
-            bind:value={bets[bet]}
-          />
-        {/each}
-      </div>
+    <div class="grid grid-cols-6 gap-4 w-fit items-center">
+      {#each Object.keys(possibleBets) as bet}
+        <label for={bet}>Bet on {bet}:</label>
+        <input
+          class="bg-surface"
+          type="number"
+          id={bet}
+          name={bet}
+          min="0"
+          max="100000"
+          bind:value={bets[bet]}
+        />
+      {/each}
+    </div>
 
     <p>Total bet: {totalBet}</p>
     <button
@@ -50,13 +50,15 @@
   </form>
 
   {#if form?.result}
-    <!-- this message is ephemeral; it exists because the page was rendered in
-	       response to a form submission. it will vanish if the user reloads -->
-    <p>Successfully spun the wheel! Result: {form.value}</p>
-    <p>Bets made:</p>
-    {#each Object.entries(form.bets).filter((bet) => bet[1] != 0) as bet}
-      <p>{bet[0]} : {bet[1]}</p>
-    {/each}
-    <p>Winnings: {form.winnings}</p>
+    {#if form.result === "success"}
+      <p>Successfully spun the wheel! Result: {form.value}</p>
+      <p>Bets made:</p>
+      {#each Object.entries(form.bets).filter((bet) => bet[1] != 0) as bet}
+        <p>{bet[0]} : {bet[1]}</p>
+      {/each}
+      <p>Winnings: {form.winnings}</p>
+    {:else if form.result === "insufficient funds"}
+      <p class="text-red-600">Insufficient funds!</p>
+    {/if}
   {/if}
 </main>

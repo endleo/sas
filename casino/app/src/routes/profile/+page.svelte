@@ -19,10 +19,11 @@
       <h1>Hi, {data.user.name}!</h1>
       <p>Your user ID is {data.user.id}.</p>
       <p>Your balance is {data.balance}.</p>
-      <form method="post" action="?/depositMoney" use:enhance>
+      <form method="post" action="?/setMoney" use:enhance>
+      <input class="bg-background" type="number" name="amount" value="0" min="0">
         <button
           class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
-          >Deposit Money</button
+          >Set Money</button
         >
       </form>
       <form method="post" action="?/signOut" use:enhance>

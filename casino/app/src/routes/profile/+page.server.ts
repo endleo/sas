@@ -25,10 +25,11 @@ export const actions: Actions = {
     });
     return redirect(302, "/");
   },
-  depositMoney: async (event) => {
+  setMoney: async (event) => {
+    const formData = await event.request.formData();
     await db
       .update(wallet)
-      .set({ money: 1e6 })
+      .set({ money: formData.get("amount") })
       .where(eq(wallet.userId, event.locals.user.id));
   },
 };
