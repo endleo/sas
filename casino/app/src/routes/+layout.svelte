@@ -31,51 +31,60 @@
   </div>
 </nav-->
 
-<div class="bg-background font-body text-on-surface selection:bg-primary selection:text-on-primary">
-
-<header
-  class="fixed top-0 w-full z-50 bg-slate-950/60 backdrop-blur-xl shadow-[0_8px_30px_rgb(6,14,32,0.08)]"
+<div
+  class="bg-background font-body text-on-surface selection:bg-primary selection:text-on-primary"
 >
-  <nav class="flex justify-between items-center w-full px-8 py-4 max-w-full">
-    <a
-      class="text-2xl font-bold tracking-tighter text-amber-400 font-headline" href="/"
-    >
-      Midnight Lounge
-  </a>
+  <header
+    class="fixed top-0 w-full z-50 bg-slate-950/60 backdrop-blur-xl shadow-[0_8px_30px_rgb(6,14,32,0.08)]"
+  >
+    <nav class="flex justify-between items-center w-full px-8 py-4 max-w-full">
+      <a
+        class="text-2xl font-bold tracking-tighter text-amber-400 font-headline"
+        href="/"
+      >
+        Midnight Lounge
+      </a>
 
-    {#if data.user}
-    <div class="hidden md:flex gap-8">
-      <a
-        class="text-slate-300 hover:text-white transition-colors font-manrope tracking-tight"
-        href="/play">Play</a
-      >
-      <a
-        class="text-slate-300 hover:text-white transition-colors font-manrope tracking-tight"
-        href="/shop">Shop</a
-      >
-    </div>
-    {/if}
+      {#if data.user}
+        <div class="hidden md:flex gap-8">
+          <a
+            class="text-slate-300 hover:text-white transition-colors font-manrope tracking-tight"
+            href="/play">Play</a
+          >
+          <a
+            class="text-slate-300 hover:text-white transition-colors font-manrope tracking-tight"
+            href="/shop">Shop</a
+          >
+        </div>
+      {/if}
 
-    {#if data.user}
-      <a
-        class="text-slate-300 hover:text-white transition-colors font-manrope tracking-tight"
-        href="/profile">Profile</a
-      >
-    {:else}
-    <div class="flex gap-4">
-      <a
-        class="text-slate-300 hover:text-white transition-all duration-300 px-4 py-2 text-sm font-headline"
-        href="/login">Sign In</a
-      >
-      <a
-        class="bg-amber-400 text-on-primary font-bold px-6 py-2 rounded-xl scale-95 active:opacity-80 transition-all font-headline"
-        href="/signup"
-        >Join Now</a
-      >
-    </div>
-    {/if}
-  </nav>
-</header>
+      {#if data.user}
+      <div class="flex gap-8 items-center">
+        <div
+          class="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-full border border-outline-variant/10"
+        >
+        <span class="font-bold text-primary">$</span>
+          <span class="font-bold text-primary">{data.balance}</span>
+        </div>
+        <a
+          class="text-slate-300 hover:text-white transition-colors font-manrope tracking-tight"
+          href="/profile">Profile</a
+        >
+        </div>
+      {:else}
+        <div class="flex gap-4">
+          <a
+            class="text-slate-300 hover:text-white transition-all duration-300 px-4 py-2 text-sm font-headline"
+            href="/login">Sign In</a
+          >
+          <a
+            class="bg-amber-400 text-on-primary font-bold px-6 py-2 rounded-xl scale-95 active:opacity-80 transition-all font-headline"
+            href="/signup">Join Now</a
+          >
+        </div>
+      {/if}
+    </nav>
+  </header>
 
-{@render children()}
+  {@render children()}
 </div>

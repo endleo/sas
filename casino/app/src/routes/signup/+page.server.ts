@@ -1,39 +1,51 @@
-import { fail, redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
-import type { PageServerLoad } from './$types';
-import { auth } from '$lib/server/auth';
-import { APIError } from 'better-auth/api';
+import { fail, redirect } from "@sveltejs/kit";
+import type { Actions } from "./$types";
+import type { PageServerLoad } from "./$types";
+import { auth } from "$lib/server/auth";
+import { APIError } from "better-auth/api";
+import { db } from "$lib/server/db";
+import { lcg, wallet } from "$lib/server/db/schema";
 
 export const load: PageServerLoad = (event) => {
-	if (event.locals.user) {
-		return redirect(302, '/profile');
-	}
-	return {};
+  if (event.locals.user) {
+    return redirect(302, "/profile");
+  }
+  return {};
 };
 
 export const actions: Actions = {
-	signUpEmail: async (event) => {
-		const formData = await event.request.formData();
-		const email = formData.get('email')?.toString() ?? '';
-		const password = formData.get('password')?.toString() ?? '';
-		const name = formData.get('name')?.toString() ?? '';
+  signUpEmail: async (event) => {
+    const formData = await event.request.formData();
+    const email = formData.get("email")?.toString() ?? "";
+    const password = formData.get("password")?.toString() ?? "";
+    const name = formData.get("name")?.toString() ?? "";
 
-		try {
-			await auth.api.signUpEmail({
-				body: {
-					email,
-					password,
-					name,
-					callbackURL: '/auth/verification-success'
-				}
-			});
-		} catch (error) {
-			if (error instanceof APIError) {
-				return fail(400, { message: error.message || 'Registration failed' });
-			}
-			return fail(500, { message: 'Unexpected error' });
-		}
+    try {
+      const signupResponse = await auth.api.signUpEmail({
+        body: {
+          email,
+          password,
+          name,
+        },
+      });
+      await db.insert(lcg).values({
+        lastResult: Math.floor(Math.random() * 2 ** 16 - 1),
+        multiplier: 75,
+        increment: 0,
+        modulus: 2 ** 16 + 1,
+        userId: signupResponse.user.id,
+      });
+      await db.insert(wallet).values({
+        money: 0,
+        userId: signupResponse.user.id,
+      });
+    } catch (error) {
+      if (error instanceof APIError) {
+        return fail(400, { message: error.message || "Registration failed" });
+      }
+      return fail(500, { message: "Unexpected error" });
+    }
 
-		return redirect(302, '/');
-	},
+    return redirect(302, "/");
+  },
 };

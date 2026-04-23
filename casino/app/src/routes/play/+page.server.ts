@@ -17,7 +17,7 @@ export const load: PageServerLoad = async (event) => {
     .from(lcg)
     .where(eq(lcg.userId, event.locals.user.id));
 
-  /* if no lcg parameters exist for user, create default parameters */
+  /* if no lcg parameters exist for user, create default parameters; should never happen */
   if (lcgData.length === 0) {
     await db.insert(lcg).values({
       lastResult: Math.floor(Math.random() * 2 ** 16 - 1),
