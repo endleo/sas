@@ -54,6 +54,12 @@ Stitch uses an additional script with `id = tailwind-config` (usually towards th
 
 Stitch also uses material icons, but these seem to not work, at least on some of the prototypes. This projects includes [Iconify for Tailwind](https://iconify.design/docs/usage/css/tailwind/tailwind4/), and icons can be included by adding the (css/tailwind) code shown on (https://icon-sets.iconify.design/). The login page includes an example of this.
 
+### Note on Roulette component
+
+We initially wanted to generate the component using stich but this proved very difficult. Instead we found an existing JS implementation and decided to use this. 
+
+The Github Repo can be found [here](https://github.com/milsaware/javascript-roulette/tree/main) and all credit goes to the authors there.
+
 ## Building & Deploying
 
 To create a production version of this app:
