@@ -2,9 +2,8 @@ import { redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 import { db } from "$lib/server/db";
 import { lcg, wallet } from "$lib/server/db/schema";
-import { user } from "$lib/server/db/schema";
 import { eq } from "drizzle-orm";
-import { calculatePayout, bets as possibleBets } from "$lib/roulette";
+import { calculatePayout } from "$lib/roulette";
 
 export const load: PageServerLoad = async (event) => {
   if (!event.locals.user) {
@@ -32,18 +31,22 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions = {
-  default: async (event) => {
+  spin: async (event) => {
     const formData = await event.request.formData();
 
-    const bets: { [key: string]: number } = {};
+    // Get the bets array from form data
+    const betsJson = formData.get("bets");
+    const betsArray: { [key: string]: number }[] = betsJson
+      ? JSON.parse(betsJson as string)
+      : [];
 
-    Object.keys(possibleBets).forEach((bet) => {
-      bets[bet] = +(formData.get(bet) || 0);
+    const bets: { [key: string]: number } = {};
+    betsArray.forEach((b) => {
+      const [key, value] = Object.entries(b)[0];
+      bets[key] = (bets[key] || 0) + value;
     });
 
-    const totalBetAmount = Object.values(bets).reduce(
-      (acc, elem) => acc + elem,
-    );
+    const totalBetAmount = Object.values(bets).reduce((acc, amt) => acc + amt, 0);
 
     /* get user's balance */
     const walletData = await db
@@ -53,7 +56,7 @@ export const actions = {
 
     /* make sure user has enough money */
     if (walletData[0].money < totalBetAmount) {
-      return { result: "insufficient funds" };
+      return { error: "insufficient funds" };
     }
 
     let updatedBalance = walletData[0].money - totalBetAmount;
@@ -88,6 +91,11 @@ export const actions = {
       .set({ money: updatedBalance })
       .where(eq(wallet.userId, event.locals.user.id));
 
-    return { result: "success", value: result, bets: bets, winnings: winnings };
+    return {
+      success: true,
+      resultNumber: result,
+      totalWinnings: winnings,
+      newBalance: updatedBalance,
+    };
   },
 } satisfies Actions;

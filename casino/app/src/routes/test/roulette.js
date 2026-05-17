@@ -1,5 +1,3 @@
-let bankValue = 1000;
-let currentBet = 0;
 let wager = 5;
 let lastWager = 0;
 let bet = [];
@@ -18,6 +16,7 @@ let container;
 let wheel;
 let ballTrack;
 let spinCallback = null;
+let controlsContainer;
 
 export function setContainerRef(containerElement) {
     container = containerElement;
@@ -30,8 +29,6 @@ export function initializeGame() {
 }
 
 export function resetGame() {
-    bankValue = 1000;
-    currentBet = 0;
     wager = 5;
     bet = [];
     numbersBet = [];
@@ -44,24 +41,6 @@ export function resetGame() {
 export function startGame() {
     buildWheel();
     buildBettingBoard();
-}
-
-export function gameOver() {
-    let notification = document.createElement("div");
-    notification.setAttribute("id", "notification");
-    let nSpan = document.createElement("span");
-    nSpan.setAttribute("class", "nSpan");
-    nSpan.innerText = "Bankrupt";
-    notification.append(nSpan);
-
-    let nBtn = document.createElement("div");
-    nBtn.setAttribute("class", "nBtn");
-    nBtn.innerText = "Play again";
-    nBtn.onclick = function () {
-        resetGame();
-    };
-    notification.append(nBtn);
-    container.prepend(notification);
 }
 
 export function buildWheel() {
@@ -142,6 +121,7 @@ export function buildBettingBoard() {
         let j = i;
         var ttbbetblock = document.createElement("div");
         ttbbetblock.setAttribute("class", "ttbbetblock");
+        ttbbetblock.style.left = (30 + j * 40) + "px";
         var numA = 1 + 3 * j;
         var numB = 2 + 3 * j;
         var numC = 3 + 3 * j;
@@ -181,6 +161,7 @@ export function buildBettingBoard() {
             let j = i;
             var ttbbetblock = document.createElement("div");
             ttbbetblock.setAttribute("class", "ttbbetblock");
+            ttbbetblock.style.left = (10 + j * 40) + "px";
             ttbbetblock.onclick = function () {
                 if (d == 1 || d == 2) {
                     var numA = 2 - (d - 1) + 3 * j;
@@ -222,6 +203,7 @@ export function buildBettingBoard() {
         var wlrtl = document.createElement("div");
         wlrtl.setAttribute("id", "wlrtl_" + c);
         wlrtl.setAttribute("class", "wlrtl");
+        wlrtl.style.left = (-10 + d * 40) + "px";
         for (let i = 1; i < 4; i++) {
             let j = i;
             var rtlbb = document.createElement("div");
@@ -242,20 +224,22 @@ export function buildBettingBoard() {
     }
 
     for (let c = 1; c < 3; c++) {
+        let row = c;
         var wlcb = document.createElement("div");
         wlcb.setAttribute("id", "wlcb_" + c);
         wlcb.setAttribute("class", "wlcb");
         for (let i = 1; i < 12; i++) {
-            let count = c == 1 ? i : i + 11;
+            let count = i;
             var cbbb = document.createElement("div");
-            cbbb.setAttribute("id", "cbbb_" + count);
+            cbbb.setAttribute("id", "cbbb_" + (row === 1 ? count : count + 11));
             cbbb.setAttribute("class", "cbbb");
+            cbbb.style.left = (30 + (count - 1) * 40) + "px";
             var numA = "2";
             var numB = "3";
             var numC = "5";
             var numD = "6";
             let num =
-                count >= 1 && count < 12
+                row === 1
                     ? parseInt(numA) +
                     (count - 1) * 3 +
                     ", " +
@@ -266,13 +250,13 @@ export function buildBettingBoard() {
                     (parseInt(numD) + (count - 1) * 3)
                     : parseInt(numA) -
                     1 +
-                    (count - 12) * 3 +
+                    (count - 1) * 3 +
                     ", " +
-                    (parseInt(numB) - 1 + (count - 12) * 3) +
+                    (parseInt(numB) - 1 + (count - 1) * 3) +
                     ", " +
-                    (parseInt(numC) - 1 + (count - 12) * 3) +
+                    (parseInt(numC) - 1 + (count - 1) * 3) +
                     ", " +
-                    (parseInt(numD) - 1 + (count - 12) * 3);
+                    (parseInt(numD) - 1 + (count - 1) * 3);
             var objType = "corner_bet";
             cbbb.onclick = function () {
                 setBet(this, num, objType, 8);
@@ -315,16 +299,15 @@ export function buildBettingBoard() {
     let numberBoard = document.createElement("div");
     numberBoard.setAttribute("class", "number_board");
 
+    // Zero field
     let zero = document.createElement("div");
     zero.setAttribute("class", "number_0");
-    var objType = "zero";
-    var odds = 35;
     zero.onclick = function () {
-        setBet(this, "0", objType, odds);
+        setBet(this, "0", "zero", 35);
     };
     zero.oncontextmenu = function (e) {
         e.preventDefault();
-        removeBet(this, "0", objType, odds);
+        removeBet(this, "0", "zero", 35);
     };
     let nbnz = document.createElement("div");
     nbnz.setAttribute("class", "nbn");
@@ -333,49 +316,14 @@ export function buildBettingBoard() {
     numberBoard.append(zero);
 
     var numberBlocks = [
-        3,
-        6,
-        9,
-        12,
-        15,
-        18,
-        21,
-        24,
-        27,
-        30,
-        33,
-        36,
-        "2 to 1",
-        2,
-        5,
-        8,
-        11,
-        14,
-        17,
-        20,
-        23,
-        26,
-        29,
-        32,
-        35,
-        "2 to 1",
-        1,
-        4,
-        7,
-        10,
-        13,
-        16,
-        19,
-        22,
-        25,
-        28,
-        31,
-        34,
-        "2 to 1",
+        3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, "2 to 1",
+        2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, "2 to 1",
+        1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34, "2 to 1"
     ];
     var redBlocks = [
         1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36,
     ];
+
     for (let i = 0; i < numberBlocks.length; i++) {
         let a = i;
         var nbClass = numberBlocks[i] == "2 to 1" ? "tt1_block" : "number_block";
@@ -390,12 +338,11 @@ export function buildBettingBoard() {
             if (numberBlocks[a] != "2 to 1") {
                 setBet(this, "" + numberBlocks[a] + "", "inside_whole", 35);
             } else {
-                let num =
-                    a == 12
-                        ? "3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36"
-                        : a == 25
-                            ? "2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35"
-                            : "1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34";
+                let row = Math.floor(a / 13);
+                let num = "";
+                if (row === 0) num = "3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36";
+                else if (row === 1) num = "2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35";
+                else num = "1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34";
                 setBet(this, num, "outside_column", 2);
             }
         };
@@ -404,12 +351,11 @@ export function buildBettingBoard() {
             if (numberBlocks[a] != "2 to 1") {
                 removeBet(this, "" + numberBlocks[a] + "", "inside_whole", 35);
             } else {
-                let num =
-                    a == 12
-                        ? "3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36"
-                        : a == 25
-                            ? "2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35"
-                            : "1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34";
+                let row = Math.floor(a / 13);
+                let num = "";
+                if (row === 0) num = "3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36";
+                else if (row === 1) num = "2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35";
+                else num = "1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34";
                 removeBet(this, num, "outside_column", 2);
             }
         };
@@ -493,6 +439,10 @@ export function buildBettingBoard() {
     }
     bettingBoard.append(otoBoard);
 
+    let controlsContainerEl = document.createElement("div");
+    controlsContainerEl.setAttribute("class", "controls_container");
+    controlsContainer = controlsContainerEl;
+
     let chipDeck = document.createElement("div");
     chipDeck.setAttribute("class", "chipDeck");
     let chipValues = [1, 5, 10, 100, "clear"];
@@ -522,12 +472,6 @@ export function buildBettingBoard() {
                 }
                 wager = parseInt(chip.childNodes[0].innerText);
             } else {
-                bankValue = bankValue + currentBet;
-                currentBet = 0;
-                document.getElementById("bankSpan").innerText =
-                    "" + bankValue.toLocaleString("en-GB") + "";
-                document.getElementById("betSpan").innerText =
-                    "" + currentBet.toLocaleString("en-GB") + "";
                 clearBet();
                 removeChips();
             }
@@ -538,27 +482,8 @@ export function buildBettingBoard() {
         chip.append(chipSpan);
         chipDeck.append(chip);
     }
-    bettingBoard.append(chipDeck);
-
-    let bankContainer = document.createElement("div");
-    bankContainer.setAttribute("class", "bankContainer");
-
-    let bank = document.createElement("div");
-    bank.setAttribute("class", "bank");
-    let bankSpan = document.createElement("span");
-    bankSpan.setAttribute("id", "bankSpan");
-    bankSpan.innerText = "" + bankValue.toLocaleString("en-GB") + "";
-    bank.append(bankSpan);
-    bankContainer.append(bank);
-
-    let bet = document.createElement("div");
-    bet.setAttribute("class", "bet");
-    let betSpan = document.createElement("span");
-    betSpan.setAttribute("id", "betSpan");
-    betSpan.innerText = "" + currentBet.toLocaleString("en-GB") + "";
-    bet.append(betSpan);
-    bankContainer.append(bet);
-    bettingBoard.append(bankContainer);
+    controlsContainer.append(chipDeck);
+    bettingBoard.append(controlsContainer);
 
     let pnBlock = document.createElement("div");
     pnBlock.setAttribute("class", "pnBlock");
@@ -581,125 +506,69 @@ export function clearBet() {
 
 export function setBet(e, n, t, o) {
     lastWager = wager;
-    wager = bankValue < wager ? bankValue : wager;
-    if (wager > 0) {
-        if (!container.querySelector(".spinBtn")) {
-            let spinBtn = document.createElement("div");
-            spinBtn.setAttribute("class", "spinBtn");
-            spinBtn.innerText = "spin";
-            spinBtn.onclick = function () {
-                this.remove();
-                if (spinCallback) {
-                    spinCallback();
-                } else {
-                    spin();
-                }
-            };
-            container.append(spinBtn);
-        }
-        bankValue = bankValue - wager;
-        currentBet = currentBet + wager;
-        document.getElementById("bankSpan").innerText =
-            "" + bankValue.toLocaleString("en-GB") + "";
-        document.getElementById("betSpan").innerText =
-            "" + currentBet.toLocaleString("en-GB") + "";
-        for (let i = 0; i < bet.length; i++) {
-            if (bet[i].numbers == n && bet[i].type == t) {
-                bet[i].amt = bet[i].amt + wager;
-                let chipColour =
-                    bet[i].amt < 5
-                        ? "red"
-                        : bet[i].amt < 10
-                            ? "blue"
-                            : bet[i].amt < 100
-                                ? "orange"
-                                : "gold";
-                e.querySelector(".chip").style.cssText = "";
-                e.querySelector(".chip").setAttribute("class", "chip " + chipColour);
-                let chipSpan = e.querySelector(".chipSpan");
-                chipSpan.innerText = bet[i].amt;
-                return;
+    if (!controlsContainer.querySelector(".spinBtn")) {
+        let spinBtn = document.createElement("div");
+        spinBtn.setAttribute("class", "spinBtn");
+        spinBtn.innerText = "spin";
+        spinBtn.onclick = function () {
+            this.remove();
+            if (spinCallback) {
+                spinCallback();
             }
-        }
-        var obj = {
-            amt: wager,
-            type: t,
-            odds: o,
-            numbers: n,
         };
-        bet.push(obj);
+        controlsContainer.append(spinBtn);
+    }
 
-        let numArray = n.split(",").map(Number);
-        for (let i = 0; i < numArray.length; i++) {
-            if (!numbersBet.includes(numArray[i])) {
-                numbersBet.push(numArray[i]);
-            }
-        }
-
-        if (!e.querySelector(".chip")) {
+    for (let i = 0; i < bet.length; i++) {
+        if (bet[i].numbers == n && bet[i].type == t) {
+            bet[i].amt = bet[i].amt + wager;
             let chipColour =
-                wager < 5
+                bet[i].amt < 5
                     ? "red"
-                    : wager < 10
+                    : bet[i].amt < 10
                         ? "blue"
-                        : wager < 100
+                        : bet[i].amt < 100
                             ? "orange"
                             : "gold";
-            let chip = document.createElement("div");
-            chip.setAttribute("class", "chip " + chipColour);
-            let chipSpan = document.createElement("span");
-            chipSpan.setAttribute("class", "chipSpan");
-            chipSpan.innerText = wager;
-            chip.append(chipSpan);
-            e.append(chip);
+            e.querySelector(".chip").style.cssText = "";
+            e.querySelector(".chip").setAttribute("class", "chip " + chipColour);
+            let chipSpan = e.querySelector(".chipSpan");
+            chipSpan.innerText = bet[i].amt;
+            return;
         }
     }
-}
+    var obj = {
+        amt: wager,
+        type: t,
+        odds: o,
+        numbers: n,
+    };
+    bet.push(obj);
 
-export function spin() {
-    var winningSpin = Math.floor(Math.random() * 37);
-    spinWheel(winningSpin);
-    setTimeout(function () {
-        if (numbersBet.includes(winningSpin)) {
-            let winValue = 0;
-            let betTotal = 0;
-            for (let i = 0; i < bet.length; i++) {
-                var numArray = bet[i].numbers.split(",").map(Number);
-                if (numArray.includes(winningSpin)) {
-                    bankValue = bankValue + bet[i].odds * bet[i].amt + bet[i].amt;
-                    winValue = winValue + bet[i].odds * bet[i].amt;
-                    betTotal = betTotal + bet[i].amt;
-                }
-            }
-            win(winningSpin, winValue, betTotal);
+    let numArray = n.split(",").map(Number);
+    for (let i = 0; i < numArray.length; i++) {
+        if (!numbersBet.includes(numArray[i])) {
+            numbersBet.push(numArray[i]);
         }
+    }
 
-        currentBet = 0;
-        document.getElementById("bankSpan").innerText =
-            "" + bankValue.toLocaleString("en-GB") + "";
-        document.getElementById("betSpan").innerText =
-            "" + currentBet.toLocaleString("en-GB") + "";
-
-        let pnClass = numRed.includes(winningSpin)
-            ? "pnRed"
-            : winningSpin == 0
-                ? "pnGreen"
-                : "pnBlack";
-        let pnContent = document.getElementById("pnContent");
-        let pnSpan = document.createElement("span");
-        pnSpan.setAttribute("class", pnClass);
-        pnSpan.innerText = winningSpin;
-        pnContent.append(pnSpan);
-        pnContent.scrollLeft = pnContent.scrollWidth;
-
-        bet = [];
-        numbersBet = [];
-        removeChips();
-        wager = lastWager;
-        if (bankValue == 0 && currentBet == 0) {
-            gameOver();
-        }
-    }, 10000);
+    if (!e.querySelector(".chip")) {
+        let chipColour =
+            wager < 5
+                ? "red"
+                : wager < 10
+                    ? "blue"
+                    : wager < 100
+                        ? "orange"
+                        : "gold";
+        let chip = document.createElement("div");
+        chip.setAttribute("class", "chip " + chipColour);
+        let chipSpan = document.createElement("span");
+        chipSpan.setAttribute("class", "chipSpan");
+        chipSpan.innerText = wager;
+        chip.append(chipSpan);
+        e.append(chip);
+    }
 }
 
 export function win(winningSpin, winValue, betTotal) {
@@ -753,12 +622,6 @@ export function removeBet(e, n, t, o) {
             if (bet[i].amt != 0) {
                 wager = bet[i].amt > wager ? wager : bet[i].amt;
                 bet[i].amt = bet[i].amt - wager;
-                bankValue = bankValue + wager;
-                currentBet = currentBet - wager;
-                document.getElementById("bankSpan").innerText =
-                    "" + bankValue.toLocaleString("en-GB") + "";
-                document.getElementById("betSpan").innerText =
-                    "" + currentBet.toLocaleString("en-GB") + "";
                 if (bet[i].amt == 0) {
                     e.querySelector(".chip").style.cssText = "display:none";
                 } else {
@@ -781,7 +644,7 @@ export function removeBet(e, n, t, o) {
         }
     }
 
-    if (currentBet == 0 && container.querySelector(".spinBtn")) {
+    if (bet.every(b => b.amt === 0) && container.querySelector(".spinBtn")) {
         document.getElementsByClassName("spinBtn")[0].remove();
     }
 }
@@ -850,69 +713,37 @@ export function spinWheelWithResult(winningSpin, callback) {
     }, 10000);
 }
 
-export function getSimpleBets() {
-    // Convert complex bets to simple bet format for backend
-    const simpleBets = {
-        even: 0,
-        odd: 0,
-        red: 0,
-        black: 0,
-        low: 0,
-        high: 0,
-        dozen1: 0,
-        dozen2: 0,
-        dozen3: 0,
-    };
+export function setupSpinButtonSubmit(submitCallback) {
+    spinCallback = submitCallback;
+}
 
-    // Process each bet in the bet array
-    for (let i = 0; i < bet.length; i++) {
-        const currentBet = bet[i];
-        const numbers = currentBet.numbers.split(",").map(n => parseInt(n.trim()));
-        const amountPerNumber = currentBet.amt / numbers.length;
+export function getBetsArray() {
+    let result = [];
+    for (let b of bet) {
+        let name = "";
+        let n = b.numbers;
+        
+        if (n === "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18") name = "low";
+        else if (n === "19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36") name = "high";
+        else if (n === "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12") name = "dozen1";
+        else if (n === "13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24") name = "dozen2";
+        else if (n === "25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36") name = "dozen3";
+        else if (n === "2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36") name = "even";
+        else if (n === "1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36") name = "red";
+        else if (n === "2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35") name = "black";
+        else if (n === "1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35") name = "odd";
+        else if (!n.includes(",")) name = n;
 
-        for (const num of numbers) {
-            // Even/Odd
-            if (num !== 0) {
-                if (num % 2 === 0) {
-                    simpleBets.even += amountPerNumber;
-                } else {
-                    simpleBets.odd += amountPerNumber;
-                }
-            }
-
-            // Red/Black
-            if (numRed.includes(num)) {
-                simpleBets.red += amountPerNumber;
-            } else if (num !== 0) {
-                simpleBets.black += amountPerNumber;
-            }
-
-            // Low/High
-            if (num >= 1 && num <= 18) {
-                simpleBets.low += amountPerNumber;
-            } else if (num >= 19 && num <= 36) {
-                simpleBets.high += amountPerNumber;
-            }
-
-            // Dozens
-            if (num >= 1 && num <= 12) {
-                simpleBets.dozen1 += amountPerNumber;
-            } else if (num >= 13 && num <= 24) {
-                simpleBets.dozen2 += amountPerNumber;
-            } else if (num >= 25 && num <= 36) {
-                simpleBets.dozen3 += amountPerNumber;
+        if (name) {
+            result.push({ [name]: b.amt });
+        } else {
+            // Decompose split, street, corner_bet, double_street, outside_column
+            let nums = n.split(",").map(x => x.trim());
+            let amtPerNum = b.amt / nums.length;
+            for (let numStr of nums) {
+                result.push({ [numStr]: amtPerNum });
             }
         }
     }
-
-    // Round to nearest integer
-    Object.keys(simpleBets).forEach(key => {
-        simpleBets[key] = Math.round(simpleBets[key]);
-    });
-
-    return simpleBets;
-}
-
-export function setupSpinButtonSubmit(submitCallback) {
-    spinCallback = submitCallback;
+    return result;
 }

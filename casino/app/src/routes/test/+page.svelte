@@ -3,9 +3,10 @@
   import './style.css';
   import * as Roulette from './roulette.js';
   import { enhance } from '$app/forms';
+  import { invalidateAll } from '$app/navigation';
 
   let container;
-  let form;
+  let form = $state();
   let isSpinning = $state(false);
 
   onMount(() => {
@@ -23,33 +24,31 @@
 
   function handleSpin() {
     // Trigger the spin animation after form submission response is received
-    setTimeout(() => {
-      if (form?.result === "success") {
-        Roulette.spinWheelWithResult(form.value, () => {
-          isSpinning = false;
-        });
-      } else {
+    if (form?.success) {
+      Roulette.spinWheelWithResult(form.resultNumber, async () => {
         isSpinning = false;
-      }
-    }, 100);
+        // TODO: Is this good idea? Invalidates entire page, but we need to update the balance and bets after the spin
+        await invalidateAll();
+      });
+    } else {
+      isSpinning = false;
+    }
   }
 
   function handleSubmit() {
-    // Get bets from betting board and populate hidden form fields
-    const simpleBets = Roulette.getSimpleBets();
+    // Get the actual bets array and add to form
+    const betsArray = Roulette.getBetsArray();
     const formElement = document.querySelector("form");
     
-    // Set hidden input values
-    Object.keys(simpleBets).forEach(betType => {
-      let input = formElement.querySelector(`input[name="${betType}"]`);
-      if (!input) {
-        input = document.createElement("input");
-        input.type = "hidden";
-        input.name = betType;
-        formElement.appendChild(input);
-      }
-      input.value = simpleBets[betType];
-    });
+    // Create or update hidden input with bets JSON
+    let betsInput = formElement.querySelector(`input[name="bets"]`);
+    if (!betsInput) {
+      betsInput = document.createElement("input");
+      betsInput.type = "hidden";
+      betsInput.name = "bets";
+      formElement.appendChild(betsInput);
+    }
+    betsInput.value = JSON.stringify(betsArray);
 
     // Submit the form
     formElement.requestSubmit();
@@ -63,6 +62,7 @@
 <main class="md:pl-48 md:pr-48 pt-20 pb-20 min-h-screen">
   <form
     method="POST"
+    action="?/spin"
     use:enhance={() => {
       handleFormSubmit();
       return async ({ result }) => {
