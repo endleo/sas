@@ -17,6 +17,7 @@ let wheelnumbersAC = [
 let container;
 let wheel;
 let ballTrack;
+let spinCallback = null;
 
 export function setContainerRef(containerElement) {
     container = containerElement;
@@ -588,7 +589,11 @@ export function setBet(e, n, t, o) {
             spinBtn.innerText = "spin";
             spinBtn.onclick = function () {
                 this.remove();
-                spin();
+                if (spinCallback) {
+                    spinCallback();
+                } else {
+                    spin();
+                }
             };
             container.append(spinBtn);
         }
@@ -822,4 +827,92 @@ export function removeChips() {
         }
         removeChips();
     }
+}
+
+export function spinWheelWithResult(winningSpin, callback) {
+    spinWheel(winningSpin);
+    setTimeout(function () {
+        let pnClass = numRed.includes(winningSpin)
+            ? "pnRed"
+            : winningSpin == 0
+                ? "pnGreen"
+                : "pnBlack";
+        let pnContent = document.getElementById("pnContent");
+        let pnSpan = document.createElement("span");
+        pnSpan.setAttribute("class", pnClass);
+        pnSpan.innerText = winningSpin;
+        pnContent.append(pnSpan);
+        pnContent.scrollLeft = pnContent.scrollWidth;
+
+        if (callback) {
+            callback();
+        }
+    }, 10000);
+}
+
+export function getSimpleBets() {
+    // Convert complex bets to simple bet format for backend
+    const simpleBets = {
+        even: 0,
+        odd: 0,
+        red: 0,
+        black: 0,
+        low: 0,
+        high: 0,
+        dozen1: 0,
+        dozen2: 0,
+        dozen3: 0,
+    };
+
+    // Process each bet in the bet array
+    for (let i = 0; i < bet.length; i++) {
+        const currentBet = bet[i];
+        const numbers = currentBet.numbers.split(",").map(n => parseInt(n.trim()));
+        const amountPerNumber = currentBet.amt / numbers.length;
+
+        for (const num of numbers) {
+            // Even/Odd
+            if (num !== 0) {
+                if (num % 2 === 0) {
+                    simpleBets.even += amountPerNumber;
+                } else {
+                    simpleBets.odd += amountPerNumber;
+                }
+            }
+
+            // Red/Black
+            if (numRed.includes(num)) {
+                simpleBets.red += amountPerNumber;
+            } else if (num !== 0) {
+                simpleBets.black += amountPerNumber;
+            }
+
+            // Low/High
+            if (num >= 1 && num <= 18) {
+                simpleBets.low += amountPerNumber;
+            } else if (num >= 19 && num <= 36) {
+                simpleBets.high += amountPerNumber;
+            }
+
+            // Dozens
+            if (num >= 1 && num <= 12) {
+                simpleBets.dozen1 += amountPerNumber;
+            } else if (num >= 13 && num <= 24) {
+                simpleBets.dozen2 += amountPerNumber;
+            } else if (num >= 25 && num <= 36) {
+                simpleBets.dozen3 += amountPerNumber;
+            }
+        }
+    }
+
+    // Round to nearest integer
+    Object.keys(simpleBets).forEach(key => {
+        simpleBets[key] = Math.round(simpleBets[key]);
+    });
+
+    return simpleBets;
+}
+
+export function setupSpinButtonSubmit(submitCallback) {
+    spinCallback = submitCallback;
 }
