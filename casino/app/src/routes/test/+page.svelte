@@ -22,13 +22,15 @@
     }, 100);
   });
 
-  function handleSpin() {
+  function handleSpin(update) {
     // Trigger the spin animation after form submission response is received
     if (form?.success) {
       Roulette.spinWheelWithResult(form.resultNumber, async () => {
         isSpinning = false;
         // TODO: Is this good idea? Invalidates entire page, but we need to update the balance and bets after the spin
-        await invalidateAll();
+//        await invalidateAll();
+        update();
+
       });
     } else {
       isSpinning = false;
@@ -65,10 +67,11 @@
     action="?/spin"
     use:enhance={() => {
       handleFormSubmit();
-      return async ({ result }) => {
+      return async ({ result, update }) => {
+        console.log(result);
         if (result.type === "success") {
           form = result.data;
-          handleSpin();
+          handleSpin(update);
         }
       };
     }}
