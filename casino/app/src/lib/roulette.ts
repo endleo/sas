@@ -98,6 +98,24 @@ export const bets: { [key: string]: Bet } = {
       .filter((field) => field.nr >= 25 && field.nr <= 36)
       .map((field) => field.nr),
   },
+  column1: {
+    payout: 3,
+    winningRolls: [...Array(12)
+      .keys()
+      .map((e) => 1 + e * 3)],
+  },
+  column2: {
+    payout: 3,
+    winningRolls: [...Array(12)
+      .keys()
+      .map((e) => 2 + e * 3)],
+  },
+  column3: {
+    payout: 3,
+    winningRolls: [...Array(12)
+      .keys()
+      .map((e) => 3 + e * 3)],
+  },  
   ...fields.reduce(
     (acc, field) => ({
       ...acc,
