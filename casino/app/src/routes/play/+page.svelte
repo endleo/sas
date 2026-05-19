@@ -4,6 +4,7 @@
   import RouletteBoard from "./board.svelte";
   import ChipSelect from "./chipselect.svelte";
   import { bets as possibleBets } from "$lib/roulette";
+  import HistoryPanel from "./historypanel.svelte";
   let { data, form }: PageProps = $props();
 
   let activeChip = $state(500);
@@ -11,6 +12,7 @@
   let totalBet = $derived(Object.values(bets).reduce((a, b) => a + b, 0));
   let lastWin = $state(0);
   let spinning = $state(false);
+  let history = $state([]);
   let spinAllowed = $derived(totalBet > 0 && !spinning);
   let lastBet = 0;
 
@@ -41,77 +43,8 @@
         </div>
       </div>
       <!-- History Panel -->
-      <div class="glass-panel rounded-2xl p-6 border border-outline-variant/10">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="font-headline font-bold text-lg text-on-surface">
-            Game History
-          </h3>
-          <div class="flex gap-2">
-            <div class="flex items-center gap-1">
-              <span class="w-2 h-2 rounded-full bg-red-500"></span>
-              <span class="text-xs font-bold text-on-surface-variant">48%</span>
-            </div>
-            <div class="flex items-center gap-1">
-              <span
-                class="w-2 h-2 rounded-full bg-surface-dim border border-outline"
-              ></span>
-              <span class="text-xs font-bold text-on-surface-variant">52%</span>
-            </div>
-          </div>
-        </div>
-        <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-          <div
-            class="flex-shrink-0 w-12 h-12 rounded-xl bg-red-600 flex flex-col items-center justify-center shadow-lg shadow-red-900/20"
-          >
-            <span class="text-lg font-black font-headline">24</span>
-            <span class="text-[8px] uppercase font-bold opacity-70">Red</span>
-          </div>
-          <div
-            class="flex-shrink-0 w-12 h-12 rounded-xl bg-surface-container-highest flex flex-col items-center justify-center border border-outline-variant/30"
-          >
-            <span class="text-lg font-black font-headline text-on-surface"
-              >13</span
-            >
-            <span class="text-[8px] uppercase font-bold opacity-70">Blk</span>
-          </div>
-          <div
-            class="flex-shrink-0 w-12 h-12 rounded-xl bg-red-600 flex flex-col items-center justify-center shadow-lg shadow-red-900/20"
-          >
-            <span class="text-lg font-black font-headline">7</span>
-            <span class="text-[8px] uppercase font-bold opacity-70">Red</span>
-          </div>
-          <div
-            class="flex-shrink-0 w-12 h-12 rounded-xl bg-surface-container-highest flex flex-col items-center justify-center border border-outline-variant/30"
-          >
-            <span class="text-lg font-black font-headline text-on-surface"
-              >32</span
-            >
-            <span class="text-[8px] uppercase font-bold opacity-70">Blk</span>
-          </div>
-          <div
-            class="flex-shrink-0 w-12 h-12 rounded-xl bg-secondary flex flex-col items-center justify-center shadow-lg shadow-secondary/20"
-          >
-            <span class="text-lg font-black font-headline text-on-secondary"
-              >0</span
-            >
-            <span class="text-[8px] uppercase font-bold opacity-70">Grn</span>
-          </div>
-          <div
-            class="flex-shrink-0 w-12 h-12 rounded-xl bg-surface-container-highest flex flex-col items-center justify-center border border-outline-variant/30"
-          >
-            <span class="text-lg font-black font-headline text-on-surface"
-              >11</span
-            >
-            <span class="text-[8px] uppercase font-bold opacity-70">Blk</span>
-          </div>
-          <div
-            class="flex-shrink-0 w-12 h-12 rounded-xl bg-red-600 flex flex-col items-center justify-center shadow-lg shadow-red-900/20"
-          >
-            <span class="text-lg font-black font-headline">19</span>
-            <span class="text-[8px] uppercase font-bold opacity-70">Red</span>
-          </div>
-        </div>
-      </div>
+       <HistoryPanel {history}/>
+
     </div>
 
     <!-- Right Column: Betting Table & Controls -->
@@ -143,6 +76,7 @@
                   console.log("spinning to " + result.data.resultNumber);
                   wheel.spin(result.data.resultNumber);
                   setTimeout(() => {
+                    history.unshift(result.data.resultNumber);
                     lastWin = result.data.totalWinnings - totalBet;
                     board.resetBets();
                     spinning = false;
