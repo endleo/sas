@@ -39,7 +39,7 @@
     resetBets();
   });
 
-//  $inspect(bets);
+  //  $inspect(bets);
 </script>
 
 {#snippet field(name: string, text: string, className: string)}
@@ -47,7 +47,12 @@
     >{text}
     {#if bets[name] > 0}
       <div class="chip {largestChipColor(bets[name])}">
-        <span class="chipSpan">{bets[name]}</span>
+        <span class="chipSpan"
+          >{new Intl.NumberFormat("en-US", {
+            notation: "compact",
+            compactDisplay: "short",
+          }).format(bets[name])}
+        </span>
       </div>
     {/if}
   </button>
@@ -58,7 +63,10 @@
     <div class="nbn">{text}</div>
     {#if bets[name] > 0}
       <div class="chip {largestChipColor(bets[name])}">
-        <span class="chipSpan">{bets[name]}</span>
+        <span class="chipSpan">{new Intl.NumberFormat("en-US", {
+            notation: "compact",
+            compactDisplay: "short",
+          }).format(bets[name])}</span>
       </div>
     {/if}
   </button>

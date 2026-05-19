@@ -7,12 +7,12 @@
   import HistoryPanel from "./historypanel.svelte";
   let { data, form }: PageProps = $props();
 
-  let activeChip = $state(500);
+  let activeChip = $state(10);
   let bets = $state({});
   let totalBet = $derived(Object.values(bets).reduce((a, b) => a + b, 0));
   let lastWin = $state(0);
   let spinning = $state(false);
-  let history = $state([]);
+  let history = $state([0]);
   let spinAllowed = $derived(totalBet > 0 && !spinning);
   let lastBet = 0;
 
@@ -43,8 +43,7 @@
         </div>
       </div>
       <!-- History Panel -->
-       <HistoryPanel {history}/>
-
+      <HistoryPanel {history} />
     </div>
 
     <!-- Right Column: Betting Table & Controls -->
@@ -53,108 +52,102 @@
       <RouletteBoard bind:this={board} bind:bets {activeChip} />
 
       <!-- Betting Controls -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         <!-- Chip Selection -->
         <ChipSelect bind:activeChip />
         <!-- Action Buttons -->
-        <div class="flex gap-4">
-          <button
-            class="flex-1 py-5 bg-surface-container-highest hover:bg-surface-bright text-on-surface font-bold rounded-2xl border border-outline-variant/20 transition-all active:scale-95 flex flex-col items-center justify-center"
-            onclick={() => board.resetBets()}
-            ><span class="icon-[line-md--trash] mb-1 text-2xl"></span>
-            <span class="text-xs uppercase tracking-tighter">Clear Bets</span>
-          </button>
-          <form
-            class="flex-2"
-            method="POST"
-            action="?/spin"
-            use:enhance={() => {
-              return async ({ result, update }) => {
-                console.log(result);
-                spinning = true;
-                if (result.type === "success") {
-                  console.log("spinning to " + result.data.resultNumber);
-                  wheel.spin(result.data.resultNumber);
-                  setTimeout(() => {
-                    history.unshift(result.data.resultNumber);
-                    lastWin = result.data.totalWinnings - totalBet;
-                    board.resetBets();
-                    spinning = false;
-                    update({ reset: false });
-                  }, 10000);
-                } else {
-                  update({ reset: false });
-                  spinning = false;
-                }
-              };
-            }}
-          >
-            {#each Object.keys(possibleBets) as bet}
-              <input type="hidden" id={bet} name={bet} bind:value={bets[bet]} />
-            {/each}
+        <div class="grid grid-cols-1 gap-y-4">
+          <div class="flex gap-4">
             <button
-              class="w-full h-full py-5 {spinAllowed
-                ? 'bg-gradient-to-br from-secondary to-on-secondary-fixed-variant text-on-secondary  shadow-[0_0_20px_rgba(78,222,163,0.3)] hover:shadow-[0_0_30px_rgba(78,222,163,0.5)] active:scale-95'
-                : 'bg-gray-600'}  font-black text-xl rounded-2xl"
-              disabled={!spinAllowed}
-            >
-              <span class="flex items-center justify-center gap-2">
-                SPIN
-                {#if !spinning}
-                  <span class="icon-[mdi--play-outline] text-4xl"></span>
-                {:else}
-                  <span class="spinner icon-[tdesign--load]"></span>
-                {/if}
-              </span>
+              class="flex-1 py-5 bg-surface-container-highest hover:bg-surface-bright text-on-surface font-bold rounded-2xl border border-outline-variant/20 transition-all active:scale-95 flex flex-col items-center justify-center"
+              onclick={() => board.resetBets()}
+              ><span class="icon-[line-md--trash] mb-1 text-2xl"></span>
+              <span class="text-xs uppercase tracking-tighter">Clear Bets</span>
             </button>
-          </form>
+            <form
+              class="flex-2"
+              method="POST"
+              action="?/spin"
+              use:enhance={() => {
+                return async ({ result, update }) => {
+                  console.log(result);
+                  spinning = true;
+                  if (result.type === "success") {
+                    console.log("spinning to " + result.data.resultNumber);
+                    wheel.spin(result.data.resultNumber);
+                    setTimeout(() => {
+                      history.unshift(result.data.resultNumber);
+                      lastWin = result.data.totalWinnings - totalBet;
+                      board.resetBets();
+                      spinning = false;
+                      update({ reset: false });
+                    }, 10000);
+                  } else {
+                    update({ reset: false });
+                    spinning = false;
+                  }
+                };
+              }}
+            >
+              {#each Object.keys(possibleBets) as bet}
+                <input
+                  type="hidden"
+                  id={bet}
+                  name={bet}
+                  bind:value={bets[bet]}
+                />
+              {/each}
+              <button
+                class="w-full h-full py-5 {spinAllowed
+                  ? 'bg-gradient-to-br from-secondary to-on-secondary-fixed-variant text-on-secondary  shadow-[0_0_20px_rgba(78,222,163,0.3)] hover:shadow-[0_0_30px_rgba(78,222,163,0.5)] active:scale-95'
+                  : 'bg-gray-600'}  font-black text-xl rounded-2xl"
+                disabled={!spinAllowed}
+              >
+                <span class="flex items-center justify-center gap-2">
+                  SPIN
+                  {#if !spinning}
+                    <span class="icon-[mdi--play-outline] text-4xl"></span>
+                  {:else}
+                    <span class="spinner icon-[tdesign--load]"></span>
+                  {/if}
+                </span>
+              </button>
+            </form>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div
+              class="bg-surface-container/40 p-4 rounded-2xl border border-outline-variant/10 backdrop-blur-sm"
+            >
+              <p
+                class="text-[10px] uppercase font-black text-on-surface-variant mb-1"
+              >
+                Total Bet
+              </p>
+              <p class="text-xl font-headline font-black text-primary">
+                ${totalBet}
+              </p>
+            </div>
+            <div
+              class="bg-surface-container/40 p-4 rounded-2xl border border-outline-variant/10 backdrop-blur-sm"
+            >
+              <p
+                class="text-[10px] uppercase font-black text-on-surface-variant mb-1"
+              >
+                Last Win
+              </p>
+              <p
+                class="text-xl font-headline font-black {lastWin >= 0
+                  ? 'text-secondary'
+                  : 'text-red-600'}"
+              >
+                ${lastWin}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
-
-      <!-- Live Betting Info (Bento Style) -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        <div
-          class="bg-surface-container/40 p-4 rounded-2xl border border-outline-variant/10 backdrop-blur-sm"
-        >
-          <p
-            class="text-[10px] uppercase font-black text-on-surface-variant mb-1"
-          >
-            Total Bet
-          </p>
-          <p class="text-xl font-headline font-black text-primary">
-            ${totalBet}
-          </p>
-        </div>
-        <div
-          class="bg-surface-container/40 p-4 rounded-2xl border border-outline-variant/10 backdrop-blur-sm"
-        >
-          <p
-            class="text-[10px] uppercase font-black text-on-surface-variant mb-1"
-          >
-            Last Win
-          </p>
-          <p
-            class="text-xl font-headline font-black {lastWin >= 0
-              ? 'text-secondary'
-              : 'text-red-600'}"
-          >
-            ${lastWin}
-          </p>
-        </div>
-        <div
-          class="bg-surface-container/40 p-4 rounded-2xl border border-outline-variant/10 backdrop-blur-sm"
-        >
-          <p
-            class="text-[10px] uppercase font-black text-on-surface-variant mb-1"
-          >
-            Max Payout
-          </p>
-          <p class="text-xl font-headline font-black text-on-surface">
-            $35,000
-          </p>
-        </div>
-        {#if form?.error}<p class="text-red-600 font-bold">{form.error}</p>{/if}
-      </div>
+      
+      {#if form?.error}<p class="text-red-600 font-bold">{form.error}</p>{/if}
     </div>
   </div>
 </main>
