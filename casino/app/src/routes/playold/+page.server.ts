@@ -2,10 +2,9 @@ import { redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 import { db } from "$lib/server/db";
 import { lcg, wallet } from "$lib/server/db/schema";
+import { user } from "$lib/server/db/schema";
 import { eq } from "drizzle-orm";
-import { calculatePayout } from "$lib/roulette";
-import { fail } from '@sveltejs/kit';
-import { bets as possibleBets } from "$lib/roulette";
+import { calculatePayout, bets as possibleBets } from "$lib/roulette";
 
 export const load: PageServerLoad = async (event) => {
   if (!event.locals.user) {
@@ -33,7 +32,7 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions = {
-  spin: async (event) => {
+  default: async (event) => {
     const formData = await event.request.formData();
 
     const bets: { [key: string]: number } = {};
@@ -42,7 +41,9 @@ export const actions = {
       bets[bet] = +(formData.get(bet) || 0);
     });
 
-    const totalBetAmount = Object.values(bets).reduce((acc, amt) => acc + amt, 0);
+    const totalBetAmount = Object.values(bets).reduce(
+      (acc, elem) => acc + elem,
+    );
 
     /* get user's balance */
     const walletData = await db
@@ -52,7 +53,7 @@ export const actions = {
 
     /* make sure user has enough money */
     if (walletData[0].money < totalBetAmount) {
-      return fail(400, { error: "insufficient funds" });
+      return { result: "insufficient funds" };
     }
 
     let updatedBalance = walletData[0].money - totalBetAmount;
@@ -87,11 +88,6 @@ export const actions = {
       .set({ money: updatedBalance })
       .where(eq(wallet.userId, event.locals.user.id));
 
-    return {
-      success: true,
-      resultNumber: result,
-      totalWinnings: winnings,
-      newBalance: updatedBalance,
-    };
+    return { result: "success", value: result, bets: bets, winnings: winnings };
   },
 } satisfies Actions;
