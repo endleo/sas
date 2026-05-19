@@ -13,7 +13,7 @@
   let lastWin = $state(0);
   let spinning = $state(false);
   let history = $state([0]);
-  let spinAllowed = $derived(totalBet > 0 && !spinning);
+  let spinAllowed = $derived(totalBet > 0 && !spinning && data.balance >= totalBet);
   let lastBet = 0;
 
   let board;
