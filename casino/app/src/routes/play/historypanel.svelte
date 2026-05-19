@@ -45,7 +45,7 @@
         ? 'bg-red-600 shadow-red-900/20'
         : color === 'black'
           ? 'bg-surface-container-highest border-outline-variant/30'
-          : 'bg-green-600 shadow-secondary/20'} flex flex-col items-center justify-center shadow-lg"
+          : 'bg-green-600'} flex flex-col items-center justify-center shadow-lg"
     >
       <span
         class="text-lg font-black font-headline {color === 'green'
