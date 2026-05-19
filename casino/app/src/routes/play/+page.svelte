@@ -21,7 +21,7 @@
 </script>
 
 <!-- Main Content Canvas -->
-<main class="pt-24 px-8 pb-12 min-h-screen relative overflow-hidden">
+<main class="pt-24 px-8 pb-12 min-h-screen relative overflow-y-auto">
   <div
     class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
   >
