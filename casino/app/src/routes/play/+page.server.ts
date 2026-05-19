@@ -88,6 +88,7 @@ export const actions = {
       .where(eq(wallet.userId, event.locals.user.id));
 
     return {
+      state: xn,
       success: true,
       resultNumber: result,
       totalWinnings: winnings,
