@@ -36,7 +36,7 @@ export const actions: Actions = {
         userId: signupResponse.user.id,
       });
       await db.insert(wallet).values({
-        money: 0,
+        money: 1000,
         userId: signupResponse.user.id,
       });
     } catch (error) {

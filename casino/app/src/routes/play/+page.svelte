@@ -5,6 +5,7 @@
   import ChipSelect from "./chipselect.svelte";
   import { bets as possibleBets } from "$lib/roulette";
   import HistoryPanel from "./historypanel.svelte";
+  import Chat from "$lib/Chat.svelte";
   let { data, form }: PageProps = $props();
 
   let activeChip = $state(10);
@@ -148,6 +149,9 @@
       </div>
       
       {#if form?.error}<p class="text-red-600 font-bold">{form.error}</p>{/if}
+      <div class="mt-4">
+        <Chat />
+      </div>
     </div>
   </div>
 </main>

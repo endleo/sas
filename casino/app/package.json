@@ -5,6 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
+		"dev:with-bot": "concurrently \"vite dev\" \"node --loader tsx bot.ts\"",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
@@ -29,11 +30,13 @@
 		"@tailwindcss/vite": "^4.2.2",
 		"@types/node": "^24",
 		"better-auth": "~1.4.21",
+		"concurrently": "^8.2.2",
 		"drizzle-kit": "^0.31.10",
 		"drizzle-orm": "^0.45.2",
 		"svelte": "^5.55.2",
 		"svelte-check": "^4.4.6",
 		"tailwindcss": "^4.2.2",
+		"tsx": "^4.7.0",
 		"typescript": "^6.0.2",
 		"vite": "^8.0.7"
 	}

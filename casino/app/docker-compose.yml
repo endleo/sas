@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - HOST=0.0.0.0
+    # Sequences the database push and launches both dev server and bot
+    command: sh -c "npm run db:push -- --force && npm run dev:with-bot -- --host 0.0.0.0"
