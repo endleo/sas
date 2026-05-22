@@ -21,6 +21,7 @@ export const lcgRelations = relations(lcg, ({ one }) => ({
 export const wallet = sqliteTable('wallet', {
 	id: text('id').primaryKey().$defaultFn(()=> crypto.randomUUID()),
 	money: integer('money').notNull(),
+	hasFlag: integer('has_flag').notNull(),
 	userId: text('user_id').notNull(),
 });
 

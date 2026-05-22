@@ -38,6 +38,7 @@ export const actions: Actions = {
       });
       await db.insert(wallet).values({
         money: 1000,
+        hasFlag: 0,
         userId: signupResponse.user.id,
       });
     } catch (error) {
