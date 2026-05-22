@@ -40,7 +40,7 @@ export const actions = {
     /* update lcg data for user */
     await db
       .update(wallet)
-      .set({ hasFlag: 1 })
+      .set({ hasFlag: 1, money: updatedBalance })
       .where(eq(wallet.userId, event.locals.user.id));
 
     return {
