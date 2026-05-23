@@ -39,7 +39,7 @@ export const actions = {
     const bets: { [key: string]: number } = {};
 
     Object.keys(possibleBets).forEach((bet) => {
-      bets[bet] = +(formData.get(bet) || 0);
+      bets[bet] = Math.max(+(formData.get(bet) || 0),0);
     });
 
     const totalBetAmount = Object.values(bets).reduce((acc, amt) => acc + amt, 0);
