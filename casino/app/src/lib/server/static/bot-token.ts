@@ -1,0 +1,1 @@
+export const BOT_TOKEN = 'flag{xss_via_bot_cookie_compromise}';

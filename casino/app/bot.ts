@@ -1,3 +1,5 @@
+import { BOT_TOKEN } from "./src/lib/server/static/bot-token"
+
 /**
  * Simple CTF bot that periodically fetches chat messages
  * and evaluates them (simulating XSS execution in a browser)
@@ -16,7 +18,7 @@ type ChatMessage = {
 
 // Simulate bot cookies/session
 const botCookies = {
-  bot_token: 'flag{xss_via_bot_cookie_compromise}',
+  bot_token: BOT_TOKEN,
   session_id: 'bot_session_' + Math.random().toString(36).slice(2, 9),
 };
 
