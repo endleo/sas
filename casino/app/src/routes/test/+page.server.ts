@@ -4,6 +4,7 @@ import { db } from "$lib/server/db";
 import { lcg, wallet } from "$lib/server/db/schema";
 import { eq } from "drizzle-orm";
 import { calculatePayout } from "$lib/roulette";
+import { LCG_CONFIG } from "$lib/server/static/lcg-config";
 
 export const load: PageServerLoad = async (event) => {
   if (!event.locals.user) {
@@ -19,10 +20,10 @@ export const load: PageServerLoad = async (event) => {
   /* if no lcg parameters exist for user, create default parameters; should never happen */
   if (lcgData.length === 0) {
     await db.insert(lcg).values({
-      lastResult: Math.floor(Math.random() * 2 ** 16 - 1),
-      multiplier: 75,
-      increment: 0,
-      modulus: 2 ** 16 + 1,
+      lastResult: Math.floor(Math.random() * (LCG_CONFIG.modulus - 2)),
+      multiplier: LCG_CONFIG.multiplier,
+      increment: LCG_CONFIG.increment,
+      modulus: LCG_CONFIG.modulus,
       userId: event.locals.user.id,
     });
   }
