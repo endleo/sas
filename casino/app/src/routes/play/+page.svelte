@@ -5,7 +5,7 @@
   import ChipSelect from "./chipselect.svelte";
   import { bets as possibleBets } from "$lib/roulette";
   import HistoryPanel from "./historypanel.svelte";
-  import Chat from "$lib/Chat.svelte";
+  import Chat from "../chat/Chat.svelte";
   let { data, form }: PageProps = $props();
 
   let activeChip = $state(10);

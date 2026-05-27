@@ -17,10 +17,18 @@ export const GET: RequestHandler = async () => {
   });
 };
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
   try {
+    // Require authentication for posting
+    if (!locals.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized: You must be logged in to post' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const body = await request.json();
-    const { text, username = 'You', type = 'user' } = body;
+    const { text } = body;
 
     if (!text || typeof text !== 'string' || text.trim().length === 0) {
       return new Response(JSON.stringify({ error: 'Invalid message' }), {
@@ -29,16 +37,21 @@ export const POST: RequestHandler = async ({ request }) => {
       });
     }
 
+    // Determine message type based on who's posting
+    // Bot account gets type 'bot', everyone else gets type 'user'
+    const isBot = locals.user.email === (process.env.BOT_EMAIL || 'bot@admin.com');
+    const messageType: 'user' | 'bot' = isBot ? 'bot' : 'user';
+
     const msg: StoredMessage = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
       text,
-      username,
-      type,
+      username: locals.user.name || locals.user.email || 'Anonymous',
+      type: messageType,
       time: Date.now(),
     };
 
     messageStore.push(msg);
-    console.log(`[API] Message added: ${username} (${type}): ${text.substring(0, 50)}`);
+    console.log(`[API] Message added: ${msg.username} (${messageType}): ${text.substring(0, 50)}`);
 
     return new Response(JSON.stringify(msg), {
       headers: { 'Content-Type': 'application/json' },

@@ -1,16 +1,9 @@
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ cookies }) => {
-  // Set a special bot cookie that is vulnerable to XSS
-  // httpOnly is false so JavaScript can read it (educational purpose)
-  cookies.set('bot_token', 'flag{xss_via_bot_cookie_compromise}', {
-    path: '/',
-    httpOnly: false, // Intentionally vulnerable - allows JS to read it
-    secure: false,
-    sameSite: 'lax',
-  });
-
-  return new Response(JSON.stringify({ message: 'Bot initialized' }), {
+export const GET: RequestHandler = async () => {
+  // Previously this endpoint set a `bot_token` cookie for the legacy bot.
+  // That cookie is no longer used; keep this endpoint as a no-op initializer.
+  return new Response(JSON.stringify({ message: 'Bot initialized (no cookie set)' }), {
     headers: { 'Content-Type': 'application/json' },
   });
 };

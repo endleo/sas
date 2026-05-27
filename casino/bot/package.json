@@ -1,0 +1,10 @@
+{
+  "name": "headless-login-bot",
+  "version": "1.0.0",
+  "description": "Headless browser login inside Docker",
+  "main": "script.js",
+  "type": "module",
+  "dependencies": {
+    "playwright": "^1.45.0"
+  }
+}
