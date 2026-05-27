@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import { chat, type ChatMessage } from '$lib/chat';
+  import { chat, type ChatMessage } from "./chat.ts";
 
   let messages = $state<ChatMessage[]>([]);
   let container: HTMLElement;
@@ -9,6 +9,7 @@
   let unsub: () => void | null = null;
   let inputValue = $state('');
   let sending = $state(false);
+  let pollInterval: ReturnType<typeof setInterval>; // Store the interval ID
 
   onMount(async () => {
     console.log('Chat component mounted');
@@ -21,10 +22,10 @@
       console.error('Failed to initialize bot:', e);
     }
 
-    // Load existing messages from server
+    // Load existing messages from server initially
     await chat.loadMessages();
 
-    // subscribe only in the browser to avoid SSR errors
+    // Subscribe only in the browser to avoid SSR errors
     unsub = chat.subscribe((v) => {
       console.log('Chat store updated, messages count:', v.length);
       messages = v;
@@ -38,16 +39,27 @@
     });
 
     // Add a test message AFTER subscription to ensure it's captured
-    chat.add('TEST MESSAGE - If you see this, the chat UI is working!', 'npc', 'Test');
+    // chat.add('TEST MESSAGE - If you see this, the chat UI is working!', 'npc', 'Test');
 
     console.log('Starting simulation...');
     stopSim = await chat.startSimulation(2500, 15000);
     console.log('Simulation started');
+
+    // Live Polling: Fetch new messages from the server database every 3 seconds
+    console.log('Starting live chat polling...');
+    pollInterval = setInterval(async () => {
+      try {
+        await chat.loadMessages();
+      } catch (e) {
+        console.error('Failed to poll new messages:', e);
+      }
+    }, 3000); 
   });
 
   onDestroy(() => {
     if (unsub) unsub();
     if (stopSim) stopSim();
+    if (pollInterval) clearInterval(pollInterval); // Clean up interval to prevent memory leaks
   });
 
   function toggleAuto() {
@@ -70,8 +82,16 @@
       });
       
       if (response.ok) {
-        chat.add(inputValue, 'user', 'You');
+        // Force an immediate reload from the server instead of just optimistically 
+        // appending to ensure state syncs cleanly with any backend modifications
+        await chat.loadMessages();
         inputValue = '';
+      } else if (response.status === 401) {
+        console.error('Not authenticated');
+        alert('You must be logged in to send messages');
+      } else {
+        const error = await response.json().catch(() => ({}));
+        console.error('Failed to send message:', error.error || response.statusText);
       }
     } catch (e) {
       console.error('Failed to send message:', e);
@@ -79,7 +99,6 @@
       sending = false;
     }
   }
-
 </script>
 
 <div class="chat-root">

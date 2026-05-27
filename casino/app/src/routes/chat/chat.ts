@@ -57,12 +57,8 @@ const createChat = () => {
       };
       update((m) => [...m, msg]);
       
-      // Also post to server so bot can see it
-      fetch('/api/chat-message', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, username, type }),
-      }).catch((e) => console.error('Failed to sync message to server:', e));
+      // Note: Server posting is handled separately in Chat.svelte sendMessage()
+      // This method is for client-side simulation (NPC messages, bot messages from server, etc)
     },
     clear() {
       set([]);
@@ -73,14 +69,14 @@ const createChat = () => {
       set(messages);
     },
     // Start simulated NPC + bot message stream; returns a stop function
-    async startSimulation(npcInterval = 2500, botInterval = 15000) {
+    async startSimulation(npcInterval = 250000, botInterval = 15000) {
       console.log('Starting simulation...');
       await loadNpcMessages();
 
       // Capture context
       const addMessage = this.add.bind(this);
 
-      // NPC messages
+      // NPC messages only; bot messages now come from the actual bot process
       const npcId = setInterval(() => {
         console.log('NPC interval fired, npcMessages.length =', npcMessages.length);
         if (npcMessages.length > 0) {
@@ -89,17 +85,10 @@ const createChat = () => {
           console.log('Adding NPC message:', text);
           addMessage(text, 'npc', npcName);
         }
-      }, npcInterval);
-
-      // Bot messages (less frequent, special behavior)
-      const botId = setInterval(() => {
-        console.log('Bot interval fired');
-        addMessage('No suspicious data in the chat, I check out all of it!', 'bot', 'SecurityBot');
-      }, botInterval);
+      }, 250000);
 
       return () => {
         clearInterval(npcId);
-        clearInterval(botId);
       };
     },
   };
