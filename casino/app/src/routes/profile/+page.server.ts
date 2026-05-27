@@ -24,12 +24,5 @@ export const actions: Actions = {
       headers: event.request.headers,
     });
     return redirect(302, "/");
-  },
-  setMoney: async (event) => {
-    const formData = await event.request.formData();
-    await db
-      .update(wallet)
-      .set({ money: formData.get("amount") })
-      .where(eq(wallet.userId, event.locals.user.id));
-  },
+  }
 };
