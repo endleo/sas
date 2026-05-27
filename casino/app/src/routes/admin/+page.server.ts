@@ -8,5 +8,7 @@ export const load: PageServerLoad = async (event) => {
     return redirect(302, "/");
   }
 
-  return { multiplier: LCG_CONFIG.multiplier, increment: LCG_CONFIG.increment, modulus: LCG_CONFIG.modulus }
-}
+  return { 
+    modulus: LCG_CONFIG.modulus 
+  };
+};
