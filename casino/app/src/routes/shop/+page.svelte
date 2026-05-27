@@ -5,8 +5,6 @@
 </script>
 
 <main class="md:pl-64 pt-20 min-h-screen">
-  <p>buy some shit</p>
-
   <div
     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
   >
