@@ -55,6 +55,12 @@
             class="text-slate-300 hover:text-white transition-colors font-manrope tracking-tight"
             href="/shop">Shop</a
           >
+        {#if data.admin}
+          <a
+            class="text-slate-300 hover:text-white transition-colors font-manrope tracking-tight"
+            href="/admin">Admin</a
+          >
+        {/if}
         </div>
       {/if}
 
