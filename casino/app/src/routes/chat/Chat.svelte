@@ -13,14 +13,6 @@
 
   onMount(async () => {
     console.log('Chat component mounted');
-    
-    // Initialize the bot (sets the vulnerable bot cookie)
-    try {
-      await fetch('/api/init-bot');
-      console.log('Bot initialized');
-    } catch (e) {
-      console.error('Failed to initialize bot:', e);
-    }
 
     // Load existing messages from server initially
     await chat.loadMessages();
@@ -37,9 +29,6 @@
         }
       });
     });
-
-    // Add a test message AFTER subscription to ensure it's captured
-    // chat.add('TEST MESSAGE - If you see this, the chat UI is working!', 'npc', 'Test');
 
     console.log('Starting simulation...');
     stopSim = await chat.startSimulation(2500, 15000);
