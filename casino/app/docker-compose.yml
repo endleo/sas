@@ -10,7 +10,27 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+    env_file:
+      - .env
     environment:
       - HOST=0.0.0.0
-    # Sequences the database push and launches both dev server and bot
-    command: sh -c "npm run db:push -- --force && npm run dev:with-bot -- --host 0.0.0.0"
+      - NODE_ENV=development
+      - DATABASE_URL=file:local.db
+    command: npm run dev -- --host 0.0.0.0
+
+  # Bot service - runs the Playwright automation bot
+  bot:
+    build:
+      context: ../bot
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - CASINO_URL=http://web:5173
+      - BOT_EMAIL=${BOT_EMAIL:-bot@admin.com}
+      - BOT_PASSWORD=${BOT_PASSWORD:-bot_password_123}
+      - NODE_ENV=production
+    depends_on:
+      web:
+        condition: service_started
+    restart: unless-stopped
