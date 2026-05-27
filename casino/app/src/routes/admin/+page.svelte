@@ -14,16 +14,12 @@
       </h1>
     </div>
 
-    {#if data.user}
-      <h1>Hi, {data.user.name}!</h1>
-      <p>The LCG is currently configured with the following parameters:</p>
-      <ul>
-        <li>Multiplier: {data.multiplier}</li>
-        <li>Increment: {data.increment}</li>
-        <li>Modulus: {data.modulus}</li>
-      </ul>
-    {:else}
-      <h1>You are not logged in.</h1>
-    {/if}
+    <h1>Hi, Admin!</h1>
+    <p>The LCG is currently configured with the following parameters:</p>
+    <ul>
+      <li>Multiplier: {data.multiplier}</li>
+      <li>Increment: {data.increment}</li>
+      <li>Modulus: {data.modulus}</li>
+    </ul>
   </div>
 </main>
