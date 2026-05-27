@@ -1,15 +1,17 @@
 .PHONY: clean build test-local
 
+APP_DIR := casino/app
+IMAGE_NAME := casino-app
+CONTAINER_NAME := casino-app-local
+
 clean:
-	rm -rf casino/app/build
-	rm -rf casino/app/.svelte-kit
-	rm -rf casino/app/dist
-	rm -rf casino/app/node_modules/.vite
+	rm -rf $(APP_DIR)/build
+	rm -rf $(APP_DIR)/.svelte-kit
+	rm -rf $(APP_DIR)/dist
+	rm -rf $(APP_DIR)/node_modules/.vite
 
 build:
-	@command -v pnpm >/dev/null 2>&1 || { echo "pnpm is not installed"; exit 1; }
-	cd casino/app && pnpm build
+	docker compose -f $(APP_DIR)/docker-compose.yml build
 
 test-local:
-	@command -v pnpm >/dev/null 2>&1 || { echo "pnpm is not installed"; exit 1; }
-	cd casino/app && pnpm dev
+	docker compose -f $(APP_DIR)/docker-compose.yml up --remove-orphans
