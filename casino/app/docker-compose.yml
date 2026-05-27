@@ -16,7 +16,12 @@ services:
       - HOST=0.0.0.0
       - NODE_ENV=development
       - DATABASE_URL=file:local.db
-    command: npm run dev -- --host 0.0.0.0
+    command: > 
+      sh -c "
+      rm -rf local.db &&
+      npm run db:push -- --force && 
+      npm run dev -- --host 0.0.0.0 
+      "
 
   # Bot service - runs the Playwright automation bot
   bot:
